@@ -1,0 +1,2 @@
+# dynamo_training_session
+DynamoDb勉強会用
