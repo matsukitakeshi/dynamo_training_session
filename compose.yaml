@@ -1,0 +1,44 @@
+services:
+  dynamodb-local:
+    container_name: dynamodb-local
+    image: amazon/dynamodb-local:1.24.0
+    user: root
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
+    volumes:
+      - dynamodb-local-data:/data
+    ports:
+      - 8000:8000
+    networks:
+      - dynamodb-network
+
+  dynamodb-admin:
+    container_name: dynamodb-admin
+    image: aaronshaf/dynamodb-admin:4.6.1
+    environment:
+      DYNAMO_ENDPOINT: http://dynamodb-local:8000
+    ports:
+      - 8001:8001
+    depends_on:
+      - dynamodb-local
+    networks:
+      - dynamodb-network
+
+  python:
+    container_name: python
+    build:
+      context: ./python
+      dockerfile: Dockerfile
+    volumes:
+      - ./python:/app
+    networks:
+      - dynamodb-network
+    tty: true
+    stdin_open: true
+
+volumes:
+  dynamodb-local-data:
+
+networks:
+  dynamodb-network:
+    driver: bridge
+    external: true
